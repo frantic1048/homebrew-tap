@@ -6,7 +6,7 @@
 class Blend < Formula
   desc "Dotfiles manager powered by Nickel DSL"
   homepage "https://github.com/frantic1048/Vanilla/tree/master/blend"
-  version "0.2.7"
+  version "0.2.10"
   license "MIT"
 
   on_macos do
