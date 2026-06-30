@@ -67,11 +67,12 @@ content = re.sub(
 
 # Update sha256 values by matching the url line above each sha256
 def replace_sha256(m):
-    archive = m.group(1)
-    if archive in checksums:
-        return f'url "{m.group(2)}"\n    sha256 "{checksums[archive]}"'
+    # group(1) = full URL, group(2) = filename only
+    filename = m.group(2)
+    if filename in checksums:
+        return f'url "{m.group(1)}"\n    sha256 "{checksums[filename]}"'
     else:
-        print(f"WARNING: no checksum found for {archive}", file=sys.stderr)
+        print(f"WARNING: no checksum found for {filename}", file=sys.stderr)
         return m.group(0)
 
 
