@@ -90,6 +90,7 @@ jobs:
 
           git config user.name "houki-san[bot]"
           git config user.email "271583647+houki-san[bot]@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git checkout -b "$BRANCH"
           git add "Formula/${FORMULA}.rb"
           git commit -m "chore: update ${FORMULA} to v${VERSION}"
