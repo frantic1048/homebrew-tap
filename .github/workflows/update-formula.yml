@@ -64,6 +64,7 @@ jobs:
 
       - name: Update formula
         if: steps.inputs.outputs.skip == 'false'
+        id: update
         env:
           FORMULA: ${{ steps.inputs.outputs.formula }}
           VERSION: ${{ steps.inputs.outputs.version }}
@@ -85,6 +86,8 @@ jobs:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           FORMULA: ${{ steps.inputs.outputs.formula }}
           VERSION: ${{ steps.inputs.outputs.version }}
+          SOURCE_REPO: ${{ steps.update.outputs.source_repo }}
+          RELEASE_TAG: ${{ steps.update.outputs.release_tag }}
         run: |
           BRANCH="dev/update-${FORMULA}-v${VERSION}"
 
@@ -98,6 +101,6 @@ jobs:
 
           gh pr create \
             --title "chore: update ${FORMULA} to v${VERSION}" \
-            --body "Automated formula update triggered by [${FORMULA}-v${VERSION}](https://github.com/frantic1048/Vanilla/releases/tag/${FORMULA}-v${VERSION}) release." \
+            --body "Automated formula update triggered by [${RELEASE_TAG}](https://github.com/${SOURCE_REPO}/releases/tag/${RELEASE_TAG}) release." \
             --base main \
             --head "$BRANCH"

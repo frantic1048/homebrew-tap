@@ -11,6 +11,14 @@ import sys
 import urllib.request
 import urllib.error
 
+FORMULA_SOURCES = {
+    "blend": {
+        "repo": "frantic1048/blend",
+        "tag_prefix": "blend",
+        "homepage": "https://github.com/frantic1048/blend",
+    },
+}
+
 formula = os.environ.get("FORMULA", "")
 version = os.environ.get("VERSION", "")
 
@@ -25,8 +33,9 @@ if not os.path.isfile(path):
 with open(path) as f:
     content = f.read()
 
-# Extract source repo and tag prefix from existing URL.
-# e.g. url "https://github.com/frantic1048/Vanilla/releases/download/blend-v..."
+# Extract the existing source repo and tag prefix from the formula. Explicit
+# mappings handle projects whose release repository has moved; other formulae
+# continue to derive this information from their current artifact URLs.
 url_match = re.search(
     r'url "https://github\.com/([^"]+)/releases/download/([^-]+)-v',
     content,
@@ -34,8 +43,11 @@ url_match = re.search(
 if not url_match:
     sys.exit(f"Could not extract source repo info from {path}")
 
-repo = url_match.group(1)
-tag_prefix = url_match.group(2)
+current_repo = url_match.group(1)
+current_tag_prefix = url_match.group(2)
+source = FORMULA_SOURCES.get(formula, {})
+repo = source.get("repo", current_repo)
+tag_prefix = source.get("tag_prefix", current_tag_prefix)
 tag = f"{tag_prefix}-v{version}"
 
 # Download checksums from the source release
@@ -64,6 +76,27 @@ content = re.sub(
     content,
 )
 
+# Point artifact URLs at the configured release repository. This also migrates
+# an existing formula when a project moves to a dedicated repository.
+content = re.sub(
+    r'https://github\.com/[^"]+/releases/download/[^-]+-v',
+    f"https://github.com/{repo}/releases/download/{tag_prefix}-v",
+    content,
+)
+
+if homepage := source.get("homepage"):
+    content = re.sub(
+        r'(^\s*homepage\s+")[^"]+(")',
+        f"\\g<1>{homepage}\\2",
+        content,
+        count=1,
+        flags=re.MULTILINE,
+    )
+    content = content.replace(
+        f"# https://github.com/{current_repo}",
+        f"# https://github.com/{repo}",
+    )
+
 
 # Update sha256 values by matching the url line above each sha256
 def replace_sha256(m):
@@ -84,5 +117,10 @@ content = re.sub(
 
 with open(path, "w") as f:
     f.write(content)
+
+if github_output := os.environ.get("GITHUB_OUTPUT"):
+    with open(github_output, "a") as f:
+        f.write(f"source_repo={repo}\n")
+        f.write(f"release_tag={tag}\n")
 
 print(f"Updated {path} to v{version}")
