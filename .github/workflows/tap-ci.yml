@@ -1,0 +1,44 @@
+name: Tap CI
+
+on:
+  pull_request:
+    paths:
+      - "Formula/**"
+      - ".github/scripts/**"
+      - ".github/workflows/tap-ci.yml"
+      - ".github/workflows/update-formula.yml"
+  push:
+    branches: [main]
+    paths:
+      - "Formula/**"
+      - ".github/scripts/**"
+      - ".github/workflows/tap-ci.yml"
+      - ".github/workflows/update-formula.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden the runner (Block unapproved outbound calls)
+        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            github.com:443
+            api.github.com:443
+            *.blob.core.windows.net:443
+            results-receiver.actions.githubusercontent.com:443
+
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Test formula updater
+        run: python3 .github/scripts/test_update_formula.py
+
+      - name: Check formula syntax
+        run: ruby -c Formula/blend.rb
