@@ -6,25 +6,28 @@
 class Blend < Formula
   desc "Dotfiles manager powered by Nickel DSL"
   homepage "https://github.com/frantic1048/blend"
-  version "0.3.4"
+  version "0.4.2"
   license "MIT"
 
   on_macos do
     if Hardware::CPU.arm?
       url "https://github.com/frantic1048/blend/releases/download/blend-v#{version}/blend-aarch64-apple-darwin.tar.xz"
-    sha256 "f37ed5dd5cba72d343de04558b8f5be34e0908df37ff5dc47f3b1e6b153b5fe6"
+    sha256 "f79082d7b70d6c8724433b81a093be243a57b02fa2a3cfff19c4e44a5cf7488f"
     elsif Hardware::CPU.intel?
       url "https://github.com/frantic1048/blend/releases/download/blend-v#{version}/blend-x86_64-apple-darwin.tar.xz"
-    sha256 "2833e886922cd61e8ee6942c14963c644b2d065f7f7367a61e48c495c63d0566"
+    sha256 "af34e2aa86652fbd43171c99579119bd5458742df072b8c26c8c4dc8e48da022"
     else
       odie "blend is not available for this architecture"
     end
   end
 
   on_linux do
-    if Hardware::CPU.intel?
+    if Hardware::CPU.arm?
+      url "https://github.com/frantic1048/blend/releases/download/blend-v#{version}/blend-aarch64-unknown-linux-gnu.tar.xz"
+      sha256 "44e469705c10554e4c5dc7f4d91cd664ea0aaabdbdf2205ecff2e6599a0cb76d"
+    elsif Hardware::CPU.intel?
       url "https://github.com/frantic1048/blend/releases/download/blend-v#{version}/blend-x86_64-unknown-linux-gnu.tar.xz"
-    sha256 "2bf9992750147f863400953cff257d0d3461d39becb83ed3dd5bd8d47a1ac0d6"
+      sha256 "81c961bc280aa26419587f94ead059396bb51eaf322e87801c0f52da343d2e97"
     else
       odie "blend is not available for this architecture"
     end
