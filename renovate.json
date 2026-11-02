@@ -1,0 +1,28 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigests"
+  ],
+  "enabledManagers": [
+    "github-actions"
+  ],
+  "branchPrefix": "dev/renovate/",
+  "automerge": false,
+  "packageRules": [
+    {
+      "groupName": "CI dependencies",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest"
+      ]
+    }
+  ],
+  "reviewers": [
+    "frantic1048"
+  ]
+}
